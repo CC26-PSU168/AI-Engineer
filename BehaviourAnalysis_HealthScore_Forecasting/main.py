@@ -365,15 +365,11 @@ def get_narrative(
             if _lstm_model:
                 fc = predict_future(_lstm_model, _lstm_preparer, days=days)
             else:
-                # Fit prophet with user data first
-                expense_df = df[df["Transaction_Type"] == "Expense"]
-                if not expense_df.empty:
-                    prophet_forecaster.fit(expense_df, verbose=False)
-                    fc = prophet_forecaster.predict(days=days)
-                    narrative = narrator.narrate_forecast(fc)
-                else:
-                    narrative = "Belum ada data pengeluaran untuk diprediksi."
-                fc = None
+                # Use the same pattern as forecast_prophet endpoint
+                if not prophet_forecaster._trained:
+                    prophet_forecaster.fit(df, verbose=False)
+                fc = prophet_forecaster.predict(days=days)
+                narrative = narrator.narrate_forecast(fc)
             if fc:
                 narrative = narrator.narrate_forecast(fc)
         except Exception as ex:

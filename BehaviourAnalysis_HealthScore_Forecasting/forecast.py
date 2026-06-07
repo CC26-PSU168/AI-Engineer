@@ -41,8 +41,10 @@ def _prepare_daily_series(df: pd.DataFrame, category: Optional[str] = None) -> p
     if category and category.lower() != "all":
         df = df[df["Category"].str.lower() == category.lower()]
 
+    daily = df.copy()
+    daily["Date"] = daily["Date"].dt.normalize()  # Strip time, keep date only
     daily = (
-        df.groupby("Date")["Amount"]
+        daily.groupby("Date")["Amount"]
         .sum()
         .reset_index()
         .rename(columns={"Date": "ds", "Amount": "y"})
@@ -71,8 +73,8 @@ def _build_prophet(yearly: bool = False) -> Prophet:
         weekly_seasonality  = True,
         daily_seasonality   = False,
         yearly_seasonality  = yearly,
-        seasonality_mode    = "multiplicative",  # lebih cocok untuk pengeluaran
-        changepoint_prior_scale = 0.05,          # fleksibilitas tren (0.05 = konservatif)
+        seasonality_mode    = "additive",          # additive lebih robust untuk data dengan banyak hari 0
+        changepoint_prior_scale = 0.1,            # fleksibilitas tren
         interval_width      = 0.80,              # confidence interval 80%
     )
 
