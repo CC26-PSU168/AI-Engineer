@@ -177,7 +177,7 @@ class GeminiNarrator:
         try:
             genai.configure(api_key=self.api_key)
             self._model = genai.GenerativeModel(
-                model_name    = "gemini-1.5-flash",
+                model_name    = "gemini-2.0-flash",
                 system_instruction = SYSTEM_PROMPT,
             )
             self._ready = True
